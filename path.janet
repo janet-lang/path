@@ -59,21 +59,36 @@
      (string/split ,sep path)))
 
 (defmacro- decl-normalize
-  [pre sep lead]
+  [pre sep sep-pattern lead]
+  (defn capture-lead
+    [& xs]
+    [:lead (xs 0)])
+  (def grammar
+    ~{:span (some (if-not ,sep-pattern 1))
+      :sep (some ,sep-pattern)
+      :trailing-sep (? (* :sep (constant :sep)))
+      :start (+ (replace '(* ,lead (? :span)) ,capture-lead)
+                ':span)
+      :main (* :start (any (* :sep ':span)) :trailing-sep)})
+  (def peg (peg/compile grammar))
   ~(defn ,(symbol pre "/normalize")
      "Normalize a path. This removes . and .. in the
      path, as well as empty path elements."
      [path]
-     (def els (string/split ,sep path))
-     (def newparts @[])
-     (if (,(symbol pre "/abspath?") path) (array/push newparts ,lead))
-     (each part els
-       (case part
-         "" nil
+     (def accum @[])
+     (def parts (peg/match ,peg path))
+     (var seen 0)
+     (each x parts
+       (match x
+         [:lead what] (array/push accum what)
+         :sep (array/push accum "")
          "." nil
-         ".." (array/pop newparts)
-         (array/push newparts part)))
-     (string/join newparts ,sep)))
+         ".." (if (= 0 seen)
+                (array/push accum x)
+                (do (-- seen) (array/pop accum)))
+         (do (++ seen) (array/push accum x))))
+     (def ret (string/join accum ,sep))
+     (if (= "" ret) "." ret)))
 
 (defmacro- decl-join
   [pre sep]
@@ -88,8 +103,8 @@
      "Coerce a path to be absolute."
      [path]
      (if (,(symbol pre "/abspath?") path)
-       path
-       (,(symbol pre "/join") (os/cwd) path))))
+       (,(symbol pre "/normalize") path)
+       (,(symbol pre "/join") (or (dyn :path-cwd) (os/cwd)) path))))
 
 #
 # Posix
@@ -106,7 +121,7 @@
 (decl-last-sep "posix" "/")
 (decl-basename "posix")
 (decl-parts "posix" "/")
-(decl-normalize "posix" "/" "")
+(decl-normalize "posix" "/" "/" "/")
 (decl-join "posix" "/")
 (decl-abspath "posix")
 
@@ -114,11 +129,12 @@
 # Windows
 #
 
-(def- abs-peg (peg/compile '(* (range "AZ") ":\\")))
+(def- abs-pat '(* (? (* (range "AZ" "az") `:`)) `\`))
+(def- abs-peg (peg/compile abs-pat))
 (defn win32/abspath?
   "Check if a path is absolute."
   [path]
-  (peg/match abs-peg path))
+  (not (not (peg/match abs-peg path))))
 
 (redef "ext" "win32/ext")
 (decl-sep "win32" "\\")
@@ -126,7 +142,7 @@
 (decl-last-sep "win32" "\\")
 (decl-basename "win32")
 (decl-parts "win32" "\\")
-(decl-normalize "win32" "\\" "C:")
+(decl-normalize "win32" `\` (set `\/`) (* (? (* (range "AZ" "az") `:`)) `\`))
 (decl-join "win32" "\\")
 (decl-abspath "win32")
 

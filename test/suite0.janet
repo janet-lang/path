@@ -19,3 +19,8 @@
 (aeq (path/posix/join "1" "2" "3") "1/2/3")
 (aeq (path/posix/join "1" ".." "2" ".." "3") "3")
 (aeq (path/posix/join "/home/" "for") "/home/for")
+
+(with-dyns [:path-cwd "D:\\Users\\sumbuddy"]
+  (aeq (path/win32/abspath "C:\\home\\pork") "C:\\home\\pork")
+  (aeq (path/win32/abspath "q:\\home\\pork") "q:\\home\\pork")
+  (aeq (path/win32/abspath "..\\home\\pork") "D:\\Users\\home\\pork"))
