@@ -15,7 +15,7 @@
 (aeq (path/posix/abspath? "") false)
 (aeq (path/posix/abspath? "//") true)
 
-(aeq (path/posix/abspath "home") (path/join (os/cwd) "home"))
+(aeq (path/abspath "home") (path/join (os/cwd) "home"))
 (aeq (path/posix/join "1" "2" "3") "1/2/3")
 (aeq (path/posix/join "1" ".." "2" ".." "3") "3")
 (aeq (path/posix/join "/home/" "for") "/home/for")
