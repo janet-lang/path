@@ -35,7 +35,7 @@
 (defmacro- decl-last-sep
   [pre sep]
   ~(def- ,(symbol pre "/last-sep-peg")
-    (peg/compile ~{:back (> -1 (+ (* ,sep ($)) :back))
+    (peg/compile '{:back (> -1 (+ (* ,sep ($)) :back))
                    :main :back})))
 
 (defmacro- decl-basename
