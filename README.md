@@ -17,6 +17,7 @@ indicates which type of path the function manipulates.
 path/sep # -> "/" on posix, "\\" on windows
 path/delim # -> ":" on posix, ";" on windows
 (path/basename "some/path.txt") # -> "path.txt"
+(path/dirname "some/path.txt") # -> "some/"
 (path/parts "some/path/file.txt") # -> ["some" "path" "file.txt"]
 (path/normalize "some/.././thing/file.txt") # -> "thing/file.txt"
 (path/join "some/path" "../thing/file.txt") # -> "some/thing/file.txt"
