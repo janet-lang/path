@@ -20,6 +20,15 @@
 (aeq (path/posix/join "1" ".." "2" ".." "3") "3")
 (aeq (path/posix/join "/home/" "for") "/home/for")
 
+(aeq (path/posix/normalize "/abc/../") "/")
+(aeq (path/posix/normalize "/abc/abc") "/abc/abc")
+(aeq (path/posix/normalize "/abc/abc/..") "/abc")
+(aeq (path/posix/normalize "/abc/abc/../") "/abc/")
+(aeq (path/posix/normalize "/abc/abc/../.") "/abc")
+(aeq (path/posix/normalize "//////abc/abc/../.") "/abc")
+(aeq (path/posix/normalize "//////.") "/")
+(aeq (path/posix/normalize "//////") "/")
+
 (with-dyns [:path-cwd "D:\\Users\\sumbuddy"]
   (aeq (path/win32/abspath "C:\\home\\pork") "C:\\home\\pork")
   (aeq (path/win32/abspath "q:\\home\\pork") "q:\\home\\pork")

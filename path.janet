@@ -66,10 +66,10 @@
   (def grammar
     ~{:span (some (if-not ,sep-pattern 1))
       :sep (some ,sep-pattern)
-      :trailing-sep (? (* :sep (constant :sep)))
-      :start (+ (replace '(* ,lead (? :span)) ,capture-lead)
-                ':span)
-      :main (* :start (any (* :sep ':span)) :trailing-sep)})
+      :main (* (? (* (replace ',lead ,capture-lead) (any ,sep-pattern)))
+               (? ':span)
+               (any (* :sep ':span))
+               (? (* :sep (constant ""))))})
   (def peg (peg/compile grammar))
   ~(defn ,(symbol pre "/normalize")
      "Normalize a path. This removes . and .. in the
@@ -78,16 +78,16 @@
      (def accum @[])
      (def parts (peg/match ,peg path))
      (var seen 0)
+     (var lead nil)
      (each x parts
        (match x
-         [:lead what] (array/push accum what)
-         :sep (array/push accum "")
+         [:lead what] (set lead what)
          "." nil
          ".." (if (= 0 seen)
                 (array/push accum x)
                 (do (-- seen) (array/pop accum)))
          (do (++ seen) (array/push accum x))))
-     (def ret (string/join accum ,sep))
+     (def ret (string (or lead "") (string/join accum ,sep)))
      (if (= "" ret) "." ret)))
 
 (defmacro- decl-join
