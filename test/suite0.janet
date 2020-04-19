@@ -1,3 +1,4 @@
+
 (import ../path :as path)
 
 (defn aeq
@@ -28,6 +29,11 @@
 (aeq (path/posix/normalize "//////abc/abc/../.") "/abc")
 (aeq (path/posix/normalize "//////.") "/")
 (aeq (path/posix/normalize "//////") "/")
+
+(aeq (path/posix/dirname "abc/def") "abc/")
+(aeq (path/posix/dirname "abc/") "abc/")
+(aeq (path/posix/basename "abc") "abc")
+(aeq (path/posix/dirname "abc") "./")
 
 (with-dyns [:path-cwd "D:\\Users\\sumbuddy"]
   (aeq (path/win32/abspath "C:\\home\\pork") "C:\\home\\pork")

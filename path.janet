@@ -36,7 +36,7 @@
   [pre sep]
   ~(def- ,(symbol pre "/last-sep-peg")
     (peg/compile '{:back (> -1 (+ (* ,sep ($)) :back))
-                   :main :back})))
+                   :main (+ :back (constant 0))})))
 
 (defmacro- decl-dirname
   [pre]
@@ -48,7 +48,7 @@
                   path
                   (length path))]
        (let [[p] m]
-         (string/slice path 0 p))
+         (if (zero? p) "./" (string/slice path 0 p)))
        path)))
 
 (defmacro- decl-basename
