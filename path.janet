@@ -38,18 +38,31 @@
     (peg/compile '{:back (> -1 (+ (* ,sep ($)) :back))
                    :main :back})))
 
+(defmacro- decl-dirname
+  [pre]
+  ~(defn ,(symbol pre "/dirname")
+     "Gets the directory name of a path."
+     [path]
+     (if-let [m (peg/match
+                  ,(symbol pre "/last-sep-peg")
+                  path
+                  (length path))]
+       (let [[p] m]
+         (string/slice path 0 p))
+       path)))
+
 (defmacro- decl-basename
   [pre]
   ~(defn ,(symbol pre "/basename")
-    "Gets the base file name of a path."
-    [path]
-    (if-let [m (peg/match
-                 ,(symbol pre "/last-sep-peg")
-                 path
-                 (length path))]
-      (let [[p] m]
-        (string/slice path p -1))
-      path)))
+     "Gets the base file name of a path."
+     [path]
+     (if-let [m (peg/match
+                  ,(symbol pre "/last-sep-peg")
+                  path
+                  (length path))]
+       (let [[p] m]
+         (string/slice path p -1))
+       path)))
 
 (defmacro- decl-parts
   [pre sep]
@@ -120,6 +133,7 @@
 (decl-delim "posix" ":")
 (decl-last-sep "posix" "/")
 (decl-basename "posix")
+(decl-dirname "posix")
 (decl-parts "posix" "/")
 (decl-normalize "posix" "/" "/" "/")
 (decl-join "posix" "/")
@@ -141,6 +155,7 @@
 (decl-delim "win32" ";")
 (decl-last-sep "win32" "\\")
 (decl-basename "win32")
+(decl-dirname "win32")
 (decl-parts "win32" "\\")
 (decl-normalize "win32" `\` (set `\/`) (* (? (* (range "AZ" "az") `:`)) `\`))
 (decl-join "win32" "\\")
@@ -155,6 +170,7 @@
    "sep"
    "delim"
    "basename"
+   "dirname"
    "abspath?"
    "abspath"
    "parts"
