@@ -1,10 +1,9 @@
-
 (import ../path :as path)
 
 (defn aeq
   "assert equal"
-  [x y]
-  (unless (= x y)
+  [x y &opt deep]
+  (unless ((if deep deep= =) x y)
     (with-dyns [:out stderr]
       (print "expected " x " to equal " y))
     (os/exit 1)))
@@ -34,6 +33,15 @@
 (aeq (path/posix/dirname "abc/") "abc/")
 (aeq (path/posix/basename "abc") "abc")
 (aeq (path/posix/dirname "abc") "./")
+
+(aeq (path/posix/ext "project.janet") ".janet")
+(aeq (path/posix/ext "/home/pork/work/project.janet") ".janet")
+
+(aeq (path/posix/parts "/home/pork/.local/share")
+     @["" "home" "pork" ".local" "share"] true)
+
+(aeq (path/posix/parts ".local/share")
+     @[".local" "share"] true)
 
 (with-dyns [:path-cwd "D:\\Users\\sumbuddy"]
   (aeq (path/win32/abspath "C:\\home\\pork") "C:\\home\\pork")
