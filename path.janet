@@ -35,8 +35,8 @@
 (defmacro- decl-last-sep
   [pre sep]
   ~(def- ,(symbol pre "/last-sep-peg")
-    (peg/compile '{:back (> -1 (+ (* ,sep ($)) :back))
-                   :main (+ :back (constant 0))})))
+     (peg/compile '{:back (> -1 (+ (* ,sep ($)) :back))
+                    :main (+ :back (constant 0))})))
 
 (defmacro- decl-dirname
   [pre]
@@ -161,6 +161,21 @@
 (decl-join "win32" "\\")
 (decl-abspath "win32")
 
+
+#
+# satisfy linters
+#
+
+(def ext nil)
+(def sep nil)
+(def delim nil)
+(def basename nil)
+(def dirname nil)
+(def abspath? nil)
+(def abspath nil)
+(def parts nil)
+(def normalize nil)
+(def join nil)
 #
 # Specialize for current OS
 #
