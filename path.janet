@@ -163,7 +163,7 @@
 
 
 #
-# satisfy linters
+# satisfy flycheck
 #
 
 (def ext nil)
