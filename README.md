@@ -1,5 +1,8 @@
 # path.janet
 
+**This module is has been moved into [spork](https://github.com/janet-lang/spork), and
+as such, this repository is no longer maintained. Please use `spork/path` instead.**
+
 Simple path manipulation module for Janet. Supports manipulation both
 windows and posix paths on any platform, and provides functions that
 work according to the current host platform.
